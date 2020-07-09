@@ -30,21 +30,21 @@ EOF
 
 resource "aws_lambda_layer_version" "lambda_layer" {
   filename   = "layer_bundle_01.zip"
-  layer_name = "stock_layer1"
+  layer_name = "stocklayer1"
 
   compatible_runtimes = ["python3.7"]
 }
 
 resource "aws_lambda_layer_version" "lambda_layer_2" {
   filename   = "layer_bundle_02.zip"
-  layer_name = "stock_layer2"
+  layer_name = "stocklayer2"
 
   compatible_runtimes = ["python3.7"]
 }
 
 resource "aws_lambda_layer_version" "lambda_layer_3" {
   filename   = "layer_bundle_03.zip"
-  layer_name = "stock_layer3"
+  layer_name = "stocklayer3"
 
   compatible_runtimes = ["python3.7"]
 }
