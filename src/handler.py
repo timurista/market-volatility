@@ -19,7 +19,7 @@ def make_github_commit():
     contents = ""
     with open("fang_volatility.json", 'r') as f:
         contents = json.loads(f)
-    res = repo.create_file(new_file_name, f"Added stock volatiltiy score for {isonow}", contents, branch="master", author="timurista")    
+    res = repo.create_file(new_file_name, f"Added stock volatility score for {isonow}", contents, branch="master", author="timurista")    
     # res = repo.update_file(contents.path, "more tests", "more tests", contents.sha, branch="test")
     print(res)
 
