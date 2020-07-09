@@ -6,6 +6,35 @@ import datetime
 from fang_volatility_rank import write_fang_change
 
 
+def cleanup_repo(repo):
+    # get a list of files
+    try:
+        dir_contents = repo.get_dir_contents("stock_scores")
+        print(dir_contents)
+        file_count = 0
+        max_files = 2
+        dir_contents.reverse()
+        for contents in dir_contents:
+            print(contents.name)
+            file_count += 1
+            if contents.name:
+                datepart = contents.name.split("___")[0]
+                delta = (
+                    datetime.datetime.fromisoformat(datepart) - datetime.datetime.now()
+                )
+                print(datepart, delta.days, file_count, max_files)
+                if delta.days > 30 or file_count > max_files:
+                    deleted_file = repo.delete_file(
+                        contents.path,
+                        "(cleanup) delete an old file",
+                        contents.sha,
+                        branch="develop",
+                    )
+                    print("DELETE FILE", deleted_file)
+    except Exception as e:
+        print(e)
+
+
 def make_github_commit():
     GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
     print(GITHUB_ACCESS_TOKEN)
@@ -30,24 +59,7 @@ def make_github_commit():
     )
     print(created_file)
 
-    # get a list of files
-    dir_contents = repo.get_dir_contents("fang_volatility")
-
-    file_count = 0
-    max_files = 2
-    for contents in dir_contents:
-        file_count += 1
-        if contents.name:
-            datepart = contents.name.split("___")
-            delta = datetime.datetime.fromisoformat(datepart) - datetime.datetime.now()
-            if delta > 30 or file_count > max_files:
-                repo.delete_file(
-                    contents.path,
-                    "(cleanup) delete an old file",
-                    contents.sha,
-                    branch="develop",
-                )
-
+    cleanup_repo(repo)
     title = f"Update stock volatility scores for current timestamp: {isonow}"
     body = """
     Summary:
