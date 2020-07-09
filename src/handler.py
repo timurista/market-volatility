@@ -16,7 +16,7 @@ def make_github_commit():
     repo = g.get_repo("timurista/market-volatility")
     # contents = repo.get_contents("src/fang_volatility.json", ref="test")
     isonow = datetime.datetime.now().isoformat()
-    new_file_name = f"src/{isonow}fang_volatility.json"
+    new_file_name = f"stock_scores/{isonow}___fang_volatility.json"
     contents = ""
     with open("fang_volatility.json", "r") as f:
         contents = json.load(f)
