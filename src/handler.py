@@ -20,14 +20,30 @@ def make_github_commit():
     contents = ""
     with open("fang_volatility.json", "r") as f:
         contents = json.load(f)
-    res = repo.create_file(
+    
+    created_file = repo.create_file(
         new_file_name,
         f"Added stock volatility score for {isonow}",
-        json.dumps(contents),
-        branch="master",
+        json.dumps(contents, indent=2),
+        branch="develop",
     )
-    # res = repo.update_file(contents.path, "more tests", "more tests", contents.sha, branch="test")
+    print(created_file)
+    title = "Update stock volatility scores for current timestamp: {isonow}"
+    body = """
+    Summary:
+    Current stock prices are out of sync and need to be merged in
+
+    Tests:
+    - [x] run the initial run command to generate the files
+    - [x] assert the json file is made
+    """
+    pr = repo.create_pull(title=title, body=body, head="develop", base="master")
+    print(pr)
+    # make a PR
+
+    res = pr.merge(commit_message=title, merge_method="squash")
     print(res)
+    # merge the pr
 
 
 def handler():
