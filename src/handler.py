@@ -2,7 +2,7 @@ from github import Github
 import os
 import json
 import datetime
-from src.fang_volatility_rank import write_fang_change
+from fang_volatility_rank import write_fang_change
 
 
 def cleanup_repo(repo):
@@ -76,7 +76,7 @@ def make_github_commit():
     # merge the pr
 
 
-def handler(event, context):
+def handler(event={}, context={}):
     write_fang_change()
     make_github_commit()
     return {"message": "success", "statusCode": 200}
