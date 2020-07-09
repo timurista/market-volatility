@@ -1,0 +1,29 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+click = "*"
+asyncio = "*"
+requests = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+oandapy = "*"
+numpy = "*"
+pandas = "*"
+oandapyv20 = "*"
+v20 = "*"
+pyyaml = "*"
+seaborn = "*"
+pandas-datareader = "*"
+matplotlib = "*"
+yfinance = "*"
+scipy = "*"
+fxcmpy = "*"
+python-socketio = "*"
+
+[requires]
+python_version = "3.7"
