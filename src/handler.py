@@ -1,0 +1,35 @@
+import boto3
+from github import Github
+import os
+import json
+import datetime
+from fang_volatility_rank import write_fang_change
+
+def make_github_commit():
+    GITHUB_ACCESS_TOKEN = os.environ.get('GITHUB_ACCESS_TOKEN')
+    print(GITHUB_ACCESS_TOKEN)
+    g = Github(GITHUB_ACCESS_TOKEN)
+    # for repo in g.get_user().get_repos():
+    #     print(repo.name)
+        # repo.edit(has_wiki=False)
+    repo = g.get_repo("timurista/market-volatility")
+    # contents = repo.get_contents("src/fang_volatility.json", ref="test")
+    isonow = datetime.datetime.now().isoformat()
+    new_file_name = f"src/{isonow}fang_volatility.json"
+    contents = ""
+    with open("fang_volatility.json", 'r') as f:
+        contents = json.loads(f)
+    res = repo.create_file(new_file_name, f"Added stock volatiltiy score for {isonow}", contents, branch="master", author="timurista")    
+    # res = repo.update_file(contents.path, "more tests", "more tests", contents.sha, branch="test")
+    print(res)
+
+def handler():
+    write_fang_change()
+    make_github_commit()
+    return {
+        "message": "success",
+        "statusCode": 200
+    }
+
+if __name__ == "__main__":
+    handler()

@@ -115,9 +115,8 @@ def capm_expected_return(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
     beta = get_beta_r(data)
     return get_expected_return(data, beta)
 
-
-if __name__ == "__main__":
-    stocks = ["AAPL", "FB", "GOOGL", "NFLX"]
+def write_fang_change():
+    stocks = ["AAPL", "FB", "GOOGL", "NFLX", "MSFT", "NVDA"]
     start_date = datetime.datetime.now() - datetime.timedelta(days=10)
     # start_date = start_date
     end_date = datetime.datetime.now()
@@ -125,15 +124,17 @@ if __name__ == "__main__":
     for stock in stocks:
         beta_r = capm_beta_r(start_date, end_date, stock)
         if beta_r:
-            stock_list.append({"ticker":stock, "beta": beta_r })
+            stock_list.append({"ticker":stock, "volatility": beta_r })
 
-        stock_list.sort(key=lambda x: x["beta"], reverse=True)
-        # beta = capm_beta(start_date, end_date, stock)
-        # expected_return = capm_expected_return(start_date, end_date, stock)
-    print(stock_list)
+        stock_list.sort(key=lambda x: x["volatility"], reverse=True)
+
     with open("fang_volatility.json", "w") as f:
         f.write(
             json.dumps(
                 {"list": stock_list, "updated": datetime.datetime.now().isoformat()}, indent=2
             )
         )
+
+
+if __name__ == "__main__":
+    write_fang_change()

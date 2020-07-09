@@ -1,2 +1,2 @@
 cd src
-pipenv run python fang-volatility-rank.py
+pipenv run python handler.py
