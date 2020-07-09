@@ -8,8 +8,6 @@ verify_ssl = true
 [packages]
 numpy = "*"
 pandas = "*"
-yfinance = "*"
-scipy = "*"
 pygithub = "*"
 
 [requires]

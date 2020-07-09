@@ -1,4 +1,3 @@
-import boto3
 from github import Github
 import os
 import json
@@ -77,7 +76,7 @@ def make_github_commit():
     # merge the pr
 
 
-def handler():
+def handler(event, context):
     write_fang_change()
     make_github_commit()
     return {"message": "success", "statusCode": 200}

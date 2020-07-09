@@ -28,11 +28,38 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
+resource "aws_lambda_layer_version" "lambda_layer" {
+  filename   = "layer_bundle_01.zip"
+  layer_name = "stock_layer1"
+
+  compatible_runtimes = ["python3.7"]
+}
+
+resource "aws_lambda_layer_version" "lambda_layer_2" {
+  filename   = "layer_bundle_02.zip"
+  layer_name = "stock_layer2"
+
+  compatible_runtimes = ["python3.7"]
+}
+
+resource "aws_lambda_layer_version" "lambda_layer_3" {
+  filename   = "layer_bundle_03.zip"
+  layer_name = "stock_layer3"
+
+  compatible_runtimes = ["python3.7"]
+}
+
+
 resource "aws_lambda_function" "stock_lambda_udpater" {
   filename      = "bundle.zip"
   function_name = "handler"
   role          = "${aws_iam_role.iam_for_lambda.arn}"
-  handler       = "handler"
+  handler       = "src/handler.handler"
+  layers = [
+      "${aws_lambda_layer_version.lambda_layer.arn}", 
+      "${aws_lambda_layer_version.lambda_layer_2.arn}",
+      "${aws_lambda_layer_version.lambda_layer_3.arn}"
+    ]
 
   # The filebase64sha256() function is available in Terraform 0.11.12 and later
   # For Terraform 0.11.11 and earlier, use the base64sha256() function and the file() function:
@@ -47,3 +74,24 @@ resource "aws_lambda_function" "stock_lambda_udpater" {
     }
   }
 }
+
+resource "aws_cloudwatch_event_rule" "every_twenty_minutes" {
+  name                = "every_twenty_minutes"
+  description         = "Fires every 20 minutes"
+  schedule_expression = "rate(20 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "check_every_twenty_minutes" {
+  rule      = aws_cloudwatch_event_rule.every_twenty_minutes.name
+  target_id = "lambda"
+  arn       = aws_lambda_function.stock_lambda_udpater.arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_check" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.stock_lambda_udpater.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.every_twenty_minutes.arn
+}
+

@@ -1,11 +1,9 @@
 import numpy as np
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import yfinance as yf
 import scipy.optimize as optimization
-from pandas_datareader import data as pdr
 import pandas as pd
-from functools import lru_cache
 import datetime
 import json
 
@@ -13,7 +11,6 @@ free_risk = 0.5
 SMP_500_TICKER = "^GSPC"
 
 
-@lru_cache(maxsize=1048)
 def stock_data(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
     stock1 = yf.download(ticker1, start=start_date, end=end_date)
 
@@ -76,34 +73,34 @@ def capm_beta_r(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
     return beta_r
 
 
-def capm(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
-    data = stock_data(start_date, end_date, ticker1, ticker2)
-    covmat = get_covmat(data)
-    beta = get_beta(covmat)
+# def capm(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
+#     data = stock_data(start_date, end_date, ticker1, ticker2)
+#     covmat = get_covmat(data)
+#     beta = get_beta(covmat)
 
-    # linear regression
-    beta_r, alpha = np.polyfit(data["m_returns"], data["s_returns"], deg=1)
-    print(f"Beta from regresison: {beta_r}")
+#     # linear regression
+#     beta_r, alpha = np.polyfit(data["m_returns"], data["s_returns"], deg=1)
+#     print(f"Beta from regresison: {beta_r}")
 
-    fig, axis = plt.subplots(1, figsize=(20, 10))
-    axis.scatter(data["m_returns"], data["s_returns"], label="data returns")
-    axis.plot(
-        data["m_returns"],
-        beta_r * data["m_returns"] + alpha,
-        color="red",
-        label="CAPM line",
-    )
-    plt.title("CAPM, alphas and betas")
-    plt.xlabel("Market Return $R_m$", fontsize=18)
-    plt.ylabel("Stock Return $R_a$")
-    plt.text(0.08, 0.05, r"$R_a = \beta * R_m + \alpha$", fontsize=18)
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+#     # fig, axis = plt.subplots(1, figsize=(20, 10))
+#     axis.scatter(data["m_returns"], data["s_returns"], label="data returns")
+#     axis.plot(
+#         data["m_returns"],
+#         beta_r * data["m_returns"] + alpha,
+#         color="red",
+#         label="CAPM line",
+#     )
+#     plt.title("CAPM, alphas and betas")
+#     plt.xlabel("Market Return $R_m$", fontsize=18)
+#     plt.ylabel("Stock Return $R_a$")
+#     plt.text(0.08, 0.05, r"$R_a = \beta * R_m + \alpha$", fontsize=18)
+#     plt.legend()
+#     plt.grid(True)
+#     plt.show()
 
-    # calc expected return
-    expected_return = free_risk + beta * (data["m_returns"].mean() * 12 - free_risk)
-    print("Expected return:", expected_return)
+#     # calc expected return
+#     expected_return = free_risk + beta * (data["m_returns"].mean() * 12 - free_risk)
+#     print("Expected return:", expected_return)
 
 
 def get_expected_return(data, beta):

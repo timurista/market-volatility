@@ -7,3 +7,7 @@ src/requirements.txt
 infra/.terraform.tfstate.lock.info
 infra/terraform.tfstate
 infra/terraform.tfstate.backup
+layer_bundle*.zip
+.DS_Store
+src/layers/*/Pipfile.lock
+
