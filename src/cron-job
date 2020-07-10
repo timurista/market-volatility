@@ -1,1 +1,1 @@
-*/15 * * * * python /usr/src/handler.py
+*/15 * * * * /usr/bin/python3 /usr/src/handler.py
