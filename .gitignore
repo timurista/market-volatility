@@ -3,7 +3,6 @@ src/python
 .terraform
 python
 bundle.zip
-src/requirements.txt
 infra/.terraform.tfstate.lock.info
 infra/terraform.tfstate
 infra/terraform.tfstate.backup

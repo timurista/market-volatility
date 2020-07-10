@@ -1,0 +1,7 @@
+version: "3"
+services:
+  github_stock_app:
+    build:
+      context: ./src
+      dockerfile: .
+    env_file: src/.env

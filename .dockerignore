@@ -1,0 +1,8 @@
+src/python
+.env
+.terraform
+python
+*.zip
+infra
+layers
+

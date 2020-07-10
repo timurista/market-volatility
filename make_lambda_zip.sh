@@ -1,3 +1,4 @@
+#!/bin/bash
 cd src/layers/v1
 pipenv lock -r > requirements.txt
 pipenv run pip install -r requirements.txt -t python

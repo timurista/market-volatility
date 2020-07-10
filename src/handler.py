@@ -1,3 +1,4 @@
+# coding=utf8
 from github import Github
 import os
 import json
@@ -49,12 +50,16 @@ def make_github_commit():
         contents = json.load(f)
 
     cleanup_repo(repo)
-    created_file = repo.create_file(
-        new_file_name,
-        f"Added stock volatility score for {isonow}",
-        json.dumps(contents, indent=2),
-        branch="develop",
-    )
+    created_file = None
+    try:
+        created_file = repo.create_file(
+            new_file_name,
+            f"Added stock volatility score for {isonow}",
+            json.dumps(contents, indent=2),
+            branch="develop",
+        )
+    except Exception as e:
+        print(e)
     print(created_file)
 
     
