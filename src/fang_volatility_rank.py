@@ -13,28 +13,32 @@ SMP_500_TICKER = "^GSPC"
 
 
 def stock_data(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
-    stock1 = yf.download(ticker1, start=start_date, end=end_date)
+    data = None
+    try:
+        stock1 = yf.download(ticker1, start=start_date, end=end_date)
 
-    start_date_s2 = datetime.datetime.now() - datetime.timedelta(days=10)
-    end_date_s2 = datetime.datetime.now()
-    stock2 = yf.download(ticker2, start=start_date, end=end_date)
+        start_date_s2 = datetime.datetime.now() - datetime.timedelta(days=10)
+        end_date_s2 = datetime.datetime.now()
+        stock2 = yf.download(ticker2, start=start_date, end=end_date)
 
-    # use resampling to get stocks in more gaussian monthly returns
-    r_stock1 = stock1.resample("M").last()
-    r_stock2 = stock2.resample("M").last()
+        # use resampling to get stocks in more gaussian monthly returns
+        r_stock1 = stock1.resample("M").last()
+        r_stock2 = stock2.resample("M").last()
 
-    # data frame
-    data = pd.DataFrame(
-        {"s_adjclose": r_stock1["Adj Close"], "m_adjclose": r_stock2["Adj Close"]},
-        index=r_stock1.index,
-    )
+        # data frame
+        data = pd.DataFrame(
+            {"s_adjclose": r_stock1["Adj Close"], "m_adjclose": r_stock2["Adj Close"]},
+            index=r_stock1.index,
+        )
 
-    # get the returns by taking log of the data
-    data[["s_returns", "m_returns"]] = np.log(
-        data[["s_adjclose", "m_adjclose"]] / data[["s_adjclose", "m_adjclose"]].shift(1)
-    )
+        # get the returns by taking log of the data
+        data[["s_returns", "m_returns"]] = np.log(
+            data[["s_adjclose", "m_adjclose"]] / data[["s_adjclose", "m_adjclose"]].shift(1)
+        )
 
-    data = data.dropna()
+        data = data.dropna()
+    except Exception as e:
+        print(e)
 
     return data
 
@@ -69,7 +73,7 @@ def capm_beta(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
 
 
 def capm_beta_r(start_date, end_date, ticker1, ticker2=SMP_500_TICKER):
-    data = stock_data(start_date, end_date, ticker1, ticker2)
+    data = stock_data(start_date, end_date, ticker1, ticker2)    
     beta_r = get_beta_r(data)
     return beta_r
 

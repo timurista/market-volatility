@@ -5,6 +5,8 @@ import json
 import datetime
 from fang_volatility_rank import write_fang_change
 from time import sleep
+import random
+
 
 def cleanup_repo(repo):
     dir_contents = repo.get_dir_contents("stock_scores")
@@ -16,9 +18,7 @@ def cleanup_repo(repo):
         file_count += 1
         if contents.name:
             datepart = contents.name.split("___")[0]
-            delta = (
-                datetime.datetime.fromisoformat(datepart) - datetime.datetime.now()
-            )
+            delta = datetime.datetime.fromisoformat(datepart) - datetime.datetime.now()
             if delta.days > 30 or file_count > max_files:
                 try:
                     deleted_file = repo.delete_file(
@@ -32,17 +32,12 @@ def cleanup_repo(repo):
                     print(e)
 
 
-
 def make_github_commit():
     GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
     print("GITHUB TOKEN", GITHUB_ACCESS_TOKEN)
     g = Github(GITHUB_ACCESS_TOKEN)
     try:
-        # for repo in g.get_user().get_repos():
-        #     print(repo.name)
-        # repo.edit(has_wiki=False)
         repo = g.get_repo("timurista/market-volatility")
-        # contents = repo.get_contents("src/fang_volatility.json", ref="test")
 
         isonow = datetime.datetime.now().isoformat()
         new_file_name = f"stock_scores/{isonow}___fang_volatility.json"
@@ -50,21 +45,49 @@ def make_github_commit():
         with open("fang_volatility.json", "r") as f:
             contents = json.load(f)
 
+        title = random.choice(
+            [
+                f"Added stock volatility score for {isonow}",
+                f"Continued work on updates for volatility scores",
+                f"More updates on volatility",
+                f"Adding score based on current time",
+                f"Another score added",
+            ]
+        )
+
         cleanup_repo(repo)
         created_file = None
         try:
             created_file = repo.create_file(
-                new_file_name,
-                f"Added stock volatility score for {isonow}",
-                json.dumps(contents, indent=2),
-                branch="develop",
+                new_file_name, title, json.dumps(contents, indent=2), branch="develop",
             )
         except Exception as e:
             print(e)
         print(created_file)
 
-        
-        title = f"Update stock volatility scores for current timestamp: {isonow}"
+        PR_TITLE = random.choice(
+            [
+                f"Latest Volatility score change",
+                f"Updates for volatility scores",
+                f"More updates on volatility",
+                f"Fix for the volatility scores",
+                f"The latest FANG and Microsoft volatility score",
+                f"Adding score based on current time",
+                f"Scores added to the current list",
+            ]
+        )
+
+        PR_COMMENT = random.choice(
+            [
+                f"LGTM! :tada:",
+                f"Nice work :ok_hand:",
+                f"GTM :thumbsup",
+                f"Done :white_check_mark:",
+                f"G2G :green_heart:",
+            ]
+        )
+
+        title = PR_TITLE
         body = """
         Summary:
         Current stock prices are out of sync and need to be merged in
@@ -75,7 +98,7 @@ def make_github_commit():
         """
         pr = repo.create_pull(title=title, body=body, head="develop", base="master")
         print(pr)
-        pr.create_issue_comment("LGTM! :tada:")
+        pr.create_issue_comment(PR_COMMENT)
 
         res = pr.merge(commit_message=title, merge_method="merge")
         print(res)
@@ -92,5 +115,4 @@ def handler(event={}, context={}):
 if __name__ == "__main__":
     while True:
         handler()
-        sleep(60 * 15)
-    
+        sleep(random.randomint(2,5))
