@@ -10,7 +10,6 @@ app = FastAPI()
 
 @app.post("/api/update_market_volatility")
 async def read_items(x_token: Optional[str] = Header(None)):
-    print(x_token)
     if isinstance(x_token, list):
         x_token = x_token[0]
     g_token = os.environ.get("GITHUB_ACCESS_TOKEN")
