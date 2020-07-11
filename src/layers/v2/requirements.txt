@@ -1,6 +1,0 @@
--i https://pypi.org/simple
-multitasking==0.0.9
-urllib3==1.25.9
-wrapt==1.12.1
-yfinance==0.1.54
-

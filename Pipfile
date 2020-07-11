@@ -8,7 +8,11 @@ verify_ssl = true
 [packages]
 numpy = "*"
 pandas = "*"
+yfinance = "*"
+scipy = "*"
 pygithub = "*"
+uvicorn = "*"
+fastapi = "*"
 
 [requires]
 python_version = "3.7"

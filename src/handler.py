@@ -3,7 +3,7 @@ from github import Github
 import os
 import json
 import datetime
-from fang_volatility_rank import write_fang_change
+from src.fang_volatility_rank import write_fang_change
 from time import sleep
 import random
 
@@ -115,4 +115,4 @@ def handler(event={}, context={}):
 if __name__ == "__main__":
     while True:
         handler()
-        sleep(random.randomint(2,5))
+        sleep(random.randint(2,5) * 60)

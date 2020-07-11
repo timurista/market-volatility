@@ -1,3 +1,2 @@
 #!/bin/bash
-cd src
-pipenv run python handler.py
+pipenv run uvicorn main:app
