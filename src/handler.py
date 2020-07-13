@@ -31,6 +31,14 @@ def cleanup_repo(repo):
                 except Exception as e:
                     print(e)
 
+def cleanup_lingering_pulls(repo, title):
+    try:
+        pulls = repo.get_pulls()
+        for pull in pulls:
+            res = pull.merge(commit_message=title, merge_method="merge")
+            print(res)
+    except Exception as e:
+        print(e)
 
 def make_github_commit():
     GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
@@ -96,14 +104,18 @@ def make_github_commit():
         - [x] run the initial run command to generate the files
         - [x] assert the json file is made
         """
+        
         pr = repo.create_pull(title=title, body=body, head="develop", base="master")
         print(pr)
         pr.create_issue_comment(PR_COMMENT)
+        
 
         res = pr.merge(commit_message=title, merge_method="merge")
         print(res)
     except Exception as e:
         print(e)
+        print("cleaning up existing MR")
+        cleanup_lingering_pulls(repo, title)
 
 
 def handler(event={}, context={}):
