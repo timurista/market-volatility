@@ -9,4 +9,6 @@ infra/terraform.tfstate.backup
 layer_bundle*.zip
 .DS_Store
 src/layers/*/Pipfile.lock
+test.json
+test*.json
 
