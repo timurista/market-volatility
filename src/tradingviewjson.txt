@@ -1,8 +1,10 @@
 {
-    "name":"Open Close Cross Strategy R5.1 revised by JustUncleL (3, SMMA, 8, 6, 0.85, 0, BOTH, 0, 0, 10000)", 
+    "name":"FB Open Close Cross Strategy R5.1 revised by JustUncleL (3, SMMA, 8, 6, 0.85, 0, BOTH, 0, 0, 10000)", 
     "order": "{{strategy.order.action}}",
     "contracts":"{{strategy.order.contracts}}",
     "ticker":"{{ticker}}", 
     "pos_size":"{{strategy.position_size}}",
+    "market_position": "{{strategy.market_position}}", 
+    "prev_market_position": "{{strategy.prev_market_position}}",
     "api_key": ""
 }
