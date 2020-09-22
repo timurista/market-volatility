@@ -58,12 +58,15 @@ def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
     print("contracts*close", contracts*close)
     return contracts
 
-def is_during_hours():
+def is_during_hours(ticker):
+    # testing out after hours
+    # TODO: MR 1 only type="limit" is allowed for extended hours orders
+    return True
     # 9:30am and 4pm east coast
     return is_time_between(time(13,30), time(20,00))
 
 def can_sell(item, api):
-    during_hours = is_during_hours()
+    during_hours = is_during_hours(item.ticker)
     return item.order == "sell" and during_hours
 
 def log_transaction(item, contracts, error):
@@ -79,8 +82,10 @@ def get_api():
 def handler(item, use_max_value=False):
     print("ITEM handler", item)
     print(item.order)
+    can_trade = is_during_hours(item.ticker)
     api = get_api()
     account = api.get_account()
+
     
     contracts = abs(int(item.pos_size))
     try:
@@ -90,7 +95,7 @@ def handler(item, use_max_value=False):
     except Exception as e:
         print(e)
 
-    if item.order == "buy" and is_during_hours():
+    if item.order == "buy" and can_trade:
         error = None
         try:
             if has_position(api, item.ticker):
@@ -102,7 +107,7 @@ def handler(item, use_max_value=False):
                     side=item.order,
                     type='market',
                     qty=contracts,
-                    time_in_force='day'                
+                    time_in_force='day'        
                 )
                 print("BUY ", res.symbol, contracts)
         except Exception as e:     
@@ -111,7 +116,7 @@ def handler(item, use_max_value=False):
         log_transaction(item, contracts, error)        
         
 
-    elif item.order == "sell" and is_during_hours():
+    elif item.order == "sell" and can_trade:
         error = None
         
         try:
@@ -132,6 +137,7 @@ def handler(item, use_max_value=False):
         log_transaction(item, contracts, error) 
             
     close_profitable_positions(api)
+    api.cancel_all_orders() # remove open orders
     account = api.get_account()
     return account.cash
 
