@@ -59,7 +59,8 @@ def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
     return contracts
 
 def is_during_hours():
-    return is_time_between(time(13,30), time(23,00))
+    # 9:30am and 4pm east coast
+    return is_time_between(time(13,30), time(20,00))
 
 def can_sell(item, api):
     during_hours = is_during_hours()
