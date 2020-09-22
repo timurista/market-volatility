@@ -1,4 +1,4 @@
-from alpaca import get_api, get_contracts, does_hold_position
+from alpaca import get_api, get_contracts, has_position, close_profitable_positions
 import json
 from pydantic import BaseModel
 import os
@@ -21,6 +21,11 @@ item = Item(**{
     "api_key": os.environ.get('SECRET_ETRADE_TOKEN')
 })
 
+def test_close_positions():
+    api = get_api()
+    closed = close_profitable_positions(api, 500)
+    print("closed", closed)
+
 
 def test_get_contracts():
     api = get_api()
@@ -37,15 +42,16 @@ def test_get_contracts_100k_no_postions():
     contracts = get_contracts(api, item, 100000, 0)
     print(contracts)
 
-def test_does_hold_position():
+def test_has_position():
     api = get_api()
-    print(does_hold_position(api, 'MR'))
+    print(has_position(api, 'MR'))
 
 def test_can_trade():
     api = get_api()
-    print(does_hold_position(api, 'MR'))
+    print(has_position(api, 'MR'))
 
 if __name__ == "__main__":
+    test_close_positions()
     test_get_contracts()
     test_get_contracts_100k()
-    test_does_hold_position()
+    test_has_position()
