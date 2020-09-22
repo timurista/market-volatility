@@ -1,6 +1,7 @@
 
 import alpaca_trade_api as tradeapi
 import os
+import boto3
 
 TOTAL_NUMBER_OF_ALERTS = os.environ.get('TOTAL_NUMBER_OF_ALERTS', 2)
 
@@ -47,36 +48,53 @@ def can_sell(item, api):
     hold_position = does_hold_position(api, item.ticker)
     return item.order == "sell" and during_hours and hold_position
 
+def log_transaction(item, contracts, error):
+    # boto3.log
+    print(item.ticker, contracts, error);
+
 def handler(item):
     print("ITEM handler", item)
     print(item.order)
     account = api.get_account()
     
     # use max of available cash
-    contracts = 1
-    try:
-        contracts = get_contracts(api, item, float(account.cash))
-    except Exception as e:
-        print(e)
+    contracts = abs(int(item.pos_size))
+    # try:
+    #     # contracts = get_contracts(api, item, float(account.cash))
+    # except Exception as e:
+    #     print(e)
 
     if item.order == "buy" and is_during_hours():
-        res = api.submit_order(
-            symbol=item.ticker,
-            side=item.order,
-            type='market',
-            qty=item.contracts,
-            time_in_force='day'
+        error = None
+        try:
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'
         )
-        print("SELL ", item, res)
-    elif item.order == "sell" and can_sell(item, api):
-        res = api.submit_order(
-            symbol=item.ticker,
-            side=item.order,
-            type='market',
-            qty=item.contracts,
-            time_in_force='day'
-        )
-        print("SELL ", item, res)
+        except Exception as e:     
+            error = e;
+
+        log_transaction(item, contracts, error)        
+        print("BUY ", res.symbol, contracts)
+
+    elif item.order == "sell" and is_during_hours():
+        error = None
+        try:
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'
+            )
+            print("SELL ", res.symbol, contracts)
+        except Exception as e:     
+            error = e;
+        log_transaction(item, contracts, error) 
+        
 
     account = api.get_account()
     positions = api.list_positions()

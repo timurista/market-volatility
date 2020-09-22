@@ -16,7 +16,7 @@ item = Item(**{
     "name":"Open Close Cross Strategy R5.1 revised by JustUncleL (3, SMMA, 8, 6, 0.85, 0, BOTH, 0, 0, 10000)", 
     "order": "buy",
     "contracts":"1",
-    "ticker":"QQQ", 
+    "ticker":"MR", 
     "pos_size":"39",
     "api_key": os.environ.get('SECRET_ETRADE_TOKEN')
 })
