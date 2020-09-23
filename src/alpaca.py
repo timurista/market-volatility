@@ -2,6 +2,7 @@
 import alpaca_trade_api as tradeapi
 import os
 import boto3
+from time import sleep
 
 # TODO: weight the alerts
 # ALL_ALERTS = [
@@ -101,7 +102,8 @@ def handler(item, use_max_value=False):
             if has_position(api, item.ticker):
                 print("CLOSE ", item.ticker, contracts)
                 res1 = api.close_position(item.ticker)
-            
+                sleep(0.5)
+                            
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
@@ -123,6 +125,7 @@ def handler(item, use_max_value=False):
             if has_position(api, item.ticker):                
                 res1 = api.close_position(item.ticker)
                 print("CLOSE ", item.ticker, contracts)
+                sleep(0.5)
             
             res = api.submit_order(
                 symbol=item.ticker,

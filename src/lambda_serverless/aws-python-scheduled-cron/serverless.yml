@@ -7,17 +7,15 @@ provider:
   runtime: python3.7
   region: us-west-2
 
-plugins:
-  - serverless-python-requirements
-
 functions:
   cron:
     handler: handler.run
+    layers:
+      - {Ref: PackageLambdaLayer}
     events:
       # Invoke Lambda function every minute
-      - schedule: rate(5 minute)
-  secondCron:
-    handler: handler.run
-    events:
-      # Invoke Lambda function Mon-Fri
-      - schedule: cron(0/5 13-23 ? * MON-FRI *)
+      - schedule: cron(0/5 13-19 ? * MON-FRI *)
+
+layers:
+  package:
+    path: py_lambda

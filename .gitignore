@@ -12,3 +12,5 @@ src/layers/*/Pipfile.lock
 test.json
 test*.json
 test2.json
+.serverless
+node_modules
