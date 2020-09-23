@@ -100,16 +100,16 @@ def handler(item, use_max_value=False):
         try:
             if has_position(api, item.ticker):
                 print("CLOSE ", item.ticker, contracts)
-                res = api.close_position(item.ticker)
-            else:
-                res = api.submit_order(
-                    symbol=item.ticker,
-                    side=item.order,
-                    type='market',
-                    qty=contracts,
-                    time_in_force='day'        
-                )
-                print("BUY ", res.symbol, contracts)
+                res1 = api.close_position(item.ticker)
+            
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'        
+            )
+            print("BUY ", res.symbol, contracts)
         except Exception as e:     
             error = e;
 
@@ -120,18 +120,18 @@ def handler(item, use_max_value=False):
         error = None
         
         try:
-            if has_position(api, item.ticker):
+            if has_position(api, item.ticker):                
+                res1 = api.close_position(item.ticker)
                 print("CLOSE ", item.ticker, contracts)
-                res = api.close_position(item.ticker)
-            else:
-                res = api.submit_order(
-                    symbol=item.ticker,
-                    side=item.order,
-                    type='market',
-                    qty=contracts,
-                    time_in_force='day'
-                )
-                print("SELL ", res.symbol, contracts)
+            
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'
+            )
+            print("SELL ", res.symbol, contracts)
         except Exception as e:     
             error = e;
         log_transaction(item, contracts, error) 
