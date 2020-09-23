@@ -15,7 +15,7 @@ from time import sleep
 #         'prof_precent': 0.76
 #     }
 # ]
-TOTAL_NUMBER_OF_ALERTS = os.environ.get('TOTAL_NUMBER_OF_ALERTS', 5)
+TOTAL_NUMBER_OF_ALERTS = os.environ.get('TOTAL_NUMBER_OF_ALERTS', 3)
 # profitability_weight = {
 #     ''
 # }
@@ -80,7 +80,7 @@ def get_api():
     api = tradeapi.REST(key_id, secret, base_url=os.environ.get('APCA_BASE_URL'))  # or use ENV Vars shown below
     return api
 
-def handler(item, use_max_value=False):
+def handler(item, use_max_value=True):
     print("ITEM handler", item)
     print(item.order)
     can_trade = is_during_hours(item.ticker)
@@ -102,7 +102,7 @@ def handler(item, use_max_value=False):
             if has_position(api, item.ticker):
                 print("CLOSE ", item.ticker, contracts)
                 res1 = api.close_position(item.ticker)
-                sleep(0.5)
+                sleep(1)
                             
             res = api.submit_order(
                 symbol=item.ticker,
@@ -125,7 +125,7 @@ def handler(item, use_max_value=False):
             if has_position(api, item.ticker):                
                 res1 = api.close_position(item.ticker)
                 print("CLOSE ", item.ticker, contracts)
-                sleep(0.5)
+                sleep(1)
             
             res = api.submit_order(
                 symbol=item.ticker,
