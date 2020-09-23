@@ -137,7 +137,7 @@ def handler(item, use_max_value=False):
         log_transaction(item, contracts, error) 
             
     close_profitable_positions(api)
-    api.cancel_all_orders() # remove open orders
+    # api.cancel_all_orders() # remove open orders
     account = api.get_account()
     return account.cash
 
