@@ -114,7 +114,7 @@ def get_api():
     return api
 
 
-def handler(item, use_max_value=False):
+def handler(item, use_max_value=True):
     print("ITEM handler", item)
     print(item.order)
     can_trade = is_during_hours(item.ticker)
@@ -141,24 +141,24 @@ def handler(item, use_max_value=False):
                 print("CLOSE ", item.ticker, contracts, closed)       
                 sleep(0.5)
             
-            # res = api.submit_order(
-            #     symbol=item.ticker,
-            #     side=item.order,
-            #     type='market',
-            #     qty=contracts,
-            #     time_in_force='day'
-            # )
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
                 type='market',
                 qty=contracts,
-                order_class='bracket',
-                time_in_force='day',
-                stop_loss={'stop_price': price * 0.95,
-                           'limit_price':  price * 0.94},
-                take_profit={'limit_price': price * 1.05}
+                time_in_force='day'
             )
+            # res = api.submit_order(
+            #     symbol=item.ticker,
+            #     side=item.order,
+            #     type='market',
+            #     qty=contracts,
+            #     order_class='bracket',
+            #     time_in_force='day',
+            #     stop_loss={'stop_price': price * 0.95,
+            #                'limit_price':  price * 0.94},
+            #     take_profit={'limit_price': price * 1.05}
+            # )
             print("BUY ", res.symbol, contracts)
         except Exception as e:
             error = e
@@ -176,25 +176,25 @@ def handler(item, use_max_value=False):
                 print("CLOSE ", item.ticker, contracts, closed) 
                 sleep(0.5)
 
-            # res = api.submit_order(
-            #     symbol=item.ticker,
-            #     side=item.order,
-            #     type='market',
-            #     qty=contracts,
-            #     time_in_force='day'
-            # )
-            price = get_current_price(api, item.ticker)
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
                 type='market',
                 qty=contracts,
-                time_in_force='day',
-                order_class='bracket',
-                stop_loss={'stop_price': price * 1.04,
-                           'limit_price':  price * 1.05},
-                take_profit={'limit_price': price * 0.95}
+                time_in_force='day'
             )
+            # price = get_current_price(api, item.ticker)
+            # res = api.submit_order(
+            #     symbol=item.ticker,
+            #     side=item.order,
+            #     type='market',
+            #     qty=contracts,
+            #     time_in_force='day',
+            #     order_class='bracket',
+            #     stop_loss={'stop_price': price * 1.04,
+            #                'limit_price':  price * 1.05},
+            #     take_profit={'limit_price': price * 0.95}
+            # )
 
             print("SELL ", res.symbol, contracts)
         except Exception as e:
