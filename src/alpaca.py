@@ -15,7 +15,7 @@ from time import sleep
 #         'prof_precent': 0.76
 #     }
 # ]
-TOTAL_NUMBER_OF_ALERTS = os.environ.get('TOTAL_NUMBER_OF_ALERTS', 3)
+TOTAL_NUMBER_OF_ALERTS = os.environ.get('TOTAL_NUMBER_OF_ALERTS', 5)
 # profitability_weight = {
 #     ''
 # }
@@ -48,7 +48,7 @@ def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
     get the cash on hand 
     """
     positions = api.list_positions()
-    avaible_fraction = num_alerts / len(positions) if len(positions) > 0 else 1
+    avaible_fraction = num_alerts / len(positions) if len(positions) > 0 else 0.6
     barset = api.get_barset(item.ticker, '5Min', limit=1)
 
     bars = barset[item.ticker]
@@ -102,11 +102,19 @@ def handler(item, use_max_value=False):
             if has_position(api, item.ticker):
                 print("CLOSE ", item.ticker, contracts)
                 res1 = api.close_position(item.ticker)
-                sleep(1)
-                            
+                sleep(0.5)
+
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day' 
+            )
+            sleep(0.2)       
+            res = api.submit_order(
+                symbol=item.ticker,
+                side="sell",
                 type='trailing_stop',
                 qty=contracts,
                 time_in_force='day',
@@ -131,10 +139,18 @@ def handler(item, use_max_value=False):
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'
+            )
+            sleep(0.2)       
+            res = api.submit_order(
+                symbol=item.ticker,
+                side="buy",
                 type='trailing_stop',
                 qty=contracts,
                 time_in_force='day',
-                trail_percent=12
+                trail_percent=12      
             )
             print("SELL ", res.symbol, contracts)
         except Exception as e:     
