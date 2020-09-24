@@ -131,10 +131,12 @@ def handler(item, use_max_value=False):
     if item.order == "buy" and can_trade:
         error = None
         price = get_current_price(api, item.ticker)
-        try:
+        try:            
             closed = close_symbol_orders(api, item.ticker)
+            sleep(0.1)
             if has_position(api, item.ticker):
-                res1 = api.close_position(item.ticker)                
+                res1 = api.close_position(item.ticker)
+                            
                 print("CLOSE ", item.ticker, contracts, closed)       
                 sleep(0.5)
             
@@ -167,6 +169,7 @@ def handler(item, use_max_value=False):
 
         try:
             closed = close_symbol_orders(api, item.ticker)
+            sleep(0.1)
             if has_position(api, item.ticker):                
                 res1 = api.close_position(item.ticker)         
                 print("CLOSE ", item.ticker, contracts, closed) 
