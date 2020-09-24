@@ -107,9 +107,10 @@ def handler(item, use_max_value=True):
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
-                type='market',
+                type='trailing_stop',
                 qty=contracts,
-                time_in_force='day'        
+                time_in_force='day',
+                trail_percent=12      
             )
             print("BUY ", res.symbol, contracts)
         except Exception as e:     
@@ -130,9 +131,10 @@ def handler(item, use_max_value=True):
             res = api.submit_order(
                 symbol=item.ticker,
                 side=item.order,
-                type='market',
+                type='trailing_stop',
                 qty=contracts,
-                time_in_force='day'
+                time_in_force='day',
+                trail_percent=12
             )
             print("SELL ", res.symbol, contracts)
         except Exception as e:     
