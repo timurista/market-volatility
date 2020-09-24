@@ -74,8 +74,9 @@ def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
     get the cash on hand 
     """
     positions = api.list_positions()
-    avaible_fraction = num_alerts / \
-        len(positions) if len(positions) > 0 else 0.6
+    bottom = (num_alerts - len(positions) ) if num_alerts > len(positions) else 1
+    avaible_fraction =  1/ bottom
+    avaible_fraction = avaible_fraction * .8 if avaible_fraction >= 0.98 else avaible_fraction
     barset = api.get_barset(item.ticker, '5Min', limit=1)
 
     bars = barset[item.ticker]
@@ -113,7 +114,7 @@ def get_api():
     return api
 
 
-def handler(item, use_max_value=False):
+def handler(item, use_max_value=True):
     print("ITEM handler", item)
     print(item.order)
     can_trade = is_during_hours(item.ticker)
