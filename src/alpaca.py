@@ -114,7 +114,7 @@ def get_api():
     return api
 
 
-def handler(item, use_max_value=True):
+def handler(item, use_max_value=False):
     print("ITEM handler", item)
     print(item.order)
     can_trade = is_during_hours(item.ticker)
