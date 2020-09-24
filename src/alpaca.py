@@ -80,7 +80,7 @@ def get_api():
     api = tradeapi.REST(key_id, secret, base_url=os.environ.get('APCA_BASE_URL'))  # or use ENV Vars shown below
     return api
 
-def handler(item, use_max_value=True):
+def handler(item, use_max_value=False):
     print("ITEM handler", item)
     print(item.order)
     can_trade = is_during_hours(item.ticker)
