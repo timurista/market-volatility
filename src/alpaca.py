@@ -196,7 +196,7 @@ def submit_trade_w_trail(api, item, contracts):
     try:
         closed = close_symbol_orders(api, item.ticker)       
         price = get_current_price(api, item.ticker)
-        trail_percent = 0.2
+        trail_percent = 15
 
         if has_position(api, item.ticker):
             api.close_position(item.ticker)
