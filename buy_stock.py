@@ -16,7 +16,7 @@ def main():
         data = json.load(json_file)
         price = get_current_price(api, 'TSLA')
         data['order'] = "buy"
-        data['pos_size'] = 39
+        data['pos_size'] = 39 * 2
         data['price'] = price
         print(requests.post("https://timurista-personal-web-tasks.herokuapp.com/api/execute_alpaca_trade", json=data).content)
 
