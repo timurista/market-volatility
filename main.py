@@ -30,6 +30,7 @@ class Item(BaseModel):
     pos_size: float
     ticker: str
     api_key: str
+    price: float
 
 @app.post("/api/execute_alpaca_trade")
 async def read_items(item: Item):

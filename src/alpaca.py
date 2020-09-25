@@ -37,7 +37,7 @@ def close_positions(api, profitmax=500):
             close_symbol_orders(api, position.symbol)
             closed.append((position.symbol, float(position.unrealized_pl)))
         elif float(position.unrealized_pl) < -150 or float(position.unrealized_plpc) < -0.01:
-            print("unrealized PL LOSS", position.symbol, position.unrealized_pl)            
+            print("unrealized PL LOSS", position.symbol, position.unrealized_pl)
             api.close_position(position.symbol)
             close_symbol_orders(api, position.symbol)
             closed.append((position.symbol, float(position.unrealized_pl)))
@@ -69,13 +69,16 @@ def get_current_price(api, ticker):
     return bars[-1].c
 
 
-def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
+def get_contracts(api, item, cash, use_max_value=False, num_alerts=TOTAL_NUMBER_OF_ALERTS):
     """
     get the cash on hand 
     """
+    if not use_max_value:
+        return abs(int(item.pos_size))
     positions = api.list_positions()
-    bottom = (num_alerts - len(positions) ) if num_alerts > len(positions) else 1
-    avaible_fraction =  1/ bottom
+    bottom = (num_alerts - len(positions)
+              ) if num_alerts > len(positions) else 1
+    avaible_fraction = 1 / bottom
     avaible_fraction = avaible_fraction * .8 if avaible_fraction >= 0.98 else avaible_fraction
     barset = api.get_barset(item.ticker, '5Min', limit=1)
 
@@ -91,7 +94,7 @@ def get_contracts(api, item, cash, num_alerts=TOTAL_NUMBER_OF_ALERTS):
 def is_during_hours(ticker):
     # testing out after hours
     # TODO: MR 1 only type="limit" is allowed for extended hours orders
-    # return True
+    return True
     # 9:30am and 4pm east coast
     return is_time_between(time(13, 30), time(20, 00))
 
@@ -113,95 +116,157 @@ def get_api():
         'APCA_BASE_URL'))  # or use ENV Vars shown below
     return api
 
+def get_oto_prices(price, orderType):
+    diff = 0.01
+    # "stop_loss": {
+    #     "stop_price": "299",
+    #     "limit_price": "298.5"
+    # }
+    if orderType == "buy":
+        return price * (1-diff), price * (1-diff*1.2)
+        # return (299, 298.5)
+    elif orderType == "sell":
+        return price * (1+diff), price * (1+diff*1.2)
+
+# def get_oco_prices(price, orderType):
+
+
+def get_prices(price, orderType):
+    diff = 0.01
+    # stop_loss_stop_price, stop_loss_limit_price,  take_profit_limit_price
+    if orderType == "buy":
+        return (price * (1-diff*1.2), price * (1-(diff)), price * (1-diff*1.5))
+        # return (price * 0.95, price * 0.94, price * 1.05)
+    elif orderType == "sell":
+        return (price * (1+diff), price * (1+(diff)), price * (1+diff*1.5))
+        # return (price * 1.04, price * 1.05, price * 0.95)
+
+
+def submit_trade_w_brackets(api, item, contracts):
+    error = None
+    try:
+        closed = close_symbol_orders(api, item.ticker)
+        price = get_current_price(api, item.ticker)
+        stop_loss_stop, stop_loss_limit = get_oto_prices(
+            price, item.order)
+        print(item.order, item.ticker, contracts, closed)
+        print("stop_loss_stop", stop_loss_stop)
+        print("stop_loss_limit", stop_loss_limit)
+        # print("take_profit_limit", take_profit_limit)
+
+        if has_position(api, item.ticker):   
+            api.close_position(item.ticker)         
+            # sleep(0.1)
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                # limit_price=item.price,
+                qty=contracts*1,
+                time_in_force='day',
+                order_class='oto',
+                stop_loss={'stop_price': stop_loss_stop,
+                           'limit_price':  stop_loss_limit},
+                # take_profit={'limit_price': take_profit_limit}
+            )
+            print(item.order, res.symbol, contracts)
+        else:
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                # limit_price=item.price,
+                time_in_force='day',
+                order_class='oto',
+                stop_loss={'stop_price': stop_loss_stop,
+                           'limit_price':  stop_loss_limit},
+                # take_profit={'limit_price': take_profit_limit}
+            )
+
+            print(item.order, res.symbol, contracts)
+    except Exception as e:
+        error = e
+
+    log_transaction(item, contracts, error)
+
+
+def submit_trade_w_trail(api, item, contracts):
+    error = None
+    try:
+        closed = close_symbol_orders(api, item.ticker)       
+        price = get_current_price(api, item.ticker)
+        trail_percent = 0.2
+
+        if has_position(api, item.ticker):
+            api.close_position(item.ticker)
+            sleep(0.1)
+
+        res1 = api.submit_order(
+            symbol=item.ticker,
+            side=item.order,
+            type='market',
+            qty=contracts,
+            time_in_force='day'
+        )
+        sleep(0.2)
+
+        res2 = api.submit_order(
+            symbol=item.ticker,
+            side="sell" if item.order == "buy" else "buy",
+            type='trailing_stop',
+            qty=contracts,
+            time_in_force='day',
+            trail_percent=trail_percent
+        )
+
+    except Exception as e:
+        error = e
+
+    log_transaction(item, contracts, error)
+
+
+def submit_regular_trade(api, item, contracts):
+    try:
+        closed = close_symbol_orders(api, item.ticker)
+        # sleep(0.1)
+        if has_position(api, item.ticker):
+            res1 = api.close_position(item.ticker)
+
+            print(item.order, item.ticker, contracts, closed)
+            sleep(0.1)
+            res = api.submit_order(
+                symbol=item.ticker,
+                side=item.order,
+                type='market',
+                qty=contracts,
+                time_in_force='day'
+            )
+        res = api.submit_order(
+            symbol=item.ticker,
+            side=item.order,
+            type='market',
+            qty=contracts,
+            time_in_force='day'
+        )
+
+        print("BUY ", res.symbol, contracts)
+    except Exception as e:
+        error = e
+
+    log_transaction(item, contracts, error)
+
 
 def handler(item, use_max_value=False):
     print("ITEM handler", item)
-    print(item.order)
     can_trade = is_during_hours(item.ticker)
     api = get_api()
     account = api.get_account()
+    contracts = get_contracts(api, item, float(account.cash), use_max_value)
+    # submit_trade_w_brackets(api, item, contracts)
+    submit_trade_w_trail(api, item, contracts)
 
-    contracts = abs(int(item.pos_size))
-    try:
-        if use_max_value:
-            # use max of available cash
-            contracts = get_contracts(api, item, float(account.cash))
-    except Exception as e:
-        print(e)
-
-    if item.order == "buy" and can_trade:
-        error = None
-        price = get_current_price(api, item.ticker)
-        try:            
-            closed = close_symbol_orders(api, item.ticker)
-            sleep(0.1)
-            if has_position(api, item.ticker):
-                res1 = api.close_position(item.ticker)
-                            
-                print("CLOSE ", item.ticker, contracts, closed)       
-                sleep(0.5)
-            
-            res = api.submit_order(
-                symbol=item.ticker,
-                side=item.order,
-                type='market',
-                qty=contracts,
-                time_in_force='day'
-            )
-            # res = api.submit_order(
-            #     symbol=item.ticker,
-            #     side=item.order,
-            #     type='market',
-            #     qty=contracts,
-            #     order_class='bracket',
-            #     time_in_force='day',
-            #     stop_loss={'stop_price': price * 0.95,
-            #                'limit_price':  price * 0.94},
-            #     take_profit={'limit_price': price * 1.05}
-            # )
-            print("BUY ", res.symbol, contracts)
-        except Exception as e:
-            error = e
-
-        log_transaction(item, contracts, error)
-
-    elif item.order == "sell" and can_trade:
-        error = None
-
-        try:
-            closed = close_symbol_orders(api, item.ticker)
-            sleep(0.1)
-            if has_position(api, item.ticker):                
-                res1 = api.close_position(item.ticker)         
-                print("CLOSE ", item.ticker, contracts, closed) 
-                sleep(0.5)
-
-            res = api.submit_order(
-                symbol=item.ticker,
-                side=item.order,
-                type='market',
-                qty=contracts,
-                time_in_force='day'
-            )
-            # price = get_current_price(api, item.ticker)
-            # res = api.submit_order(
-            #     symbol=item.ticker,
-            #     side=item.order,
-            #     type='market',
-            #     qty=contracts,
-            #     time_in_force='day',
-            #     order_class='bracket',
-            #     stop_loss={'stop_price': price * 1.04,
-            #                'limit_price':  price * 1.05},
-            #     take_profit={'limit_price': price * 0.95}
-            # )
-
-            print("SELL ", res.symbol, contracts)
-        except Exception as e:
-            error = e
-        log_transaction(item, contracts, error)
-
-    close_positions(api)
+    # close_positions(api)
     # api.cancel_all_orders() # remove open orders
     account = api.get_account()
     return account.cash

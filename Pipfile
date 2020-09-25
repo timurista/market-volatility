@@ -19,6 +19,9 @@ pyetrade = "*"
 alpaca-trade-api = "*"
 pydantic = "*"
 boto3 = "*"
+alpaca-backtrader-api = "*"
+backtrader = "*"
+matplotlib = "~=3.2.2"
 
 [requires]
 python_version = "3.7"
