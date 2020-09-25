@@ -3,10 +3,11 @@ import json
 from src.alpaca import get_api, get_current_price
 from time import sleep
 
+
 def main():
     data = None
     api = get_api()
-    
+
     with open('test.json') as json_file:
         data = json.load(json_file)
         price = get_current_price(api, 'TSLA')
