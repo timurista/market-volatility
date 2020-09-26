@@ -74,7 +74,7 @@ def get_contracts(api, item, cash, use_max_value=False, num_alerts=TOTAL_NUMBER_
     get the cash on hand 
     """
     if not use_max_value:
-        return abs(int(item.pos_size))
+        return abs(int(item.contracts))
     positions = api.list_positions()
     bottom = (num_alerts - len(positions)
               ) if num_alerts > len(positions) else 1

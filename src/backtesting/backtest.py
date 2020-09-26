@@ -10,7 +10,7 @@ ALPACA_PAPER = True
 
 class SmaCross(bt.SignalStrategy):
   def __init__(self):
-    sma1, sma2 = bt.ind.SMA(period=10), bt.ind.SMA(period=30)
+    sma1, sma2 = bt.ind.SMA(period=20), bt.ind.SMA(period=200)
     crossover = bt.ind.CrossOver(sma1, sma2)
     self.signal_add(bt.SIGNAL_LONG, crossover)
 
@@ -29,8 +29,8 @@ if not ALPACA_PAPER:
   cerebro.setbroker(broker)
 
 DataFactory = store.getdata  # or use alpaca_backtrader_api.AlpacaData
-data0 = DataFactory(dataname='AAPL', historical=True, fromdate=datetime(
-    2015, 1, 1), timeframe=bt.TimeFrame.Days)
+data0 = DataFactory(dataname='TSLA', historical=True, fromdate=datetime(
+    2020, 9, 20), timeframe=bt.TimeFrame.Minutes)
 cerebro.adddata(data0)
 
 print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
