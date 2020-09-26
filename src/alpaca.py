@@ -190,26 +190,49 @@ def submit_trade_w_brackets(api, item, contracts):
 
     log_transaction(item, contracts, error)
 
-
-def submit_trade_w_trail(api, item, contracts):
+def sell_limit_order(api, item, contracts):
     error = None
     try:
-        closed = close_symbol_orders(api, item.ticker)       
-        price = get_current_price(api, item.ticker)
-        trail_percent = 0.5
+        res1 = api.submit_order(
+            symbol=item.ticker,
+            side=item.order,
+            type='limit',
+            limit_price=item.price,
+            qty=contracts,
+            time_in_force='day'
+        )
+    except Exception as e:
+        error = e
+    print(item.order, item.ticker, 'limit', item.price, contracts)
+    print("error", error)
 
-        if has_position(api, item.ticker):
-            api.close_position(item.ticker)
-            sleep(0.1)
+def submit_trade_w_trail(api, item, contracts):
+    """
+    sells are handled by using only limit orders
+    and only if the user has a position
+    """
+    error = None
+    if item.order == "sell" and has_position(api, item.ticker):
+        return sell_limit_order(api, item, contracts)
+
+    # sell
+    try:
+        # closed = close_symbol_orders(api, item.ticker)       
+        # price = get_current_price(api, item.ticker)
+        trail_percent = 0.5 # to lock in profits, can vary based on the 
 
         res1 = api.submit_order(
             symbol=item.ticker,
             side=item.order,
-            type='market',
+            type='limit',
             qty=contracts,
-            time_in_force='day'
+            time_in_force='day',
+            limit_price=item.price # using the price from the alert
         )
-        sleep(0.2)
+        
+        # wait a second before submitting the order
+        # the attempt here is to use stop order        
+        sleep(1)
 
         res2 = api.submit_order(
             symbol=item.ticker,
