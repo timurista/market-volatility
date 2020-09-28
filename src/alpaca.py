@@ -214,7 +214,8 @@ def submit_trade_w_trail(api, item, contracts):
     error = None
     if item.order == "sell" and has_position(api, item.ticker):
         return sell_limit_order(api, item, contracts)
-
+    elif item.order == "sell":
+        return False
     # sell
     try:
         # closed = close_symbol_orders(api, item.ticker)       
