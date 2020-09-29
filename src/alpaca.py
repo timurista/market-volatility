@@ -31,12 +31,12 @@ def close_positions(api, profitmax=500):
     positions = api.list_positions()
     closed = []
     for position in positions:
-        if float(position.unrealized_pl) > 100 or float(position.unrealized_plpc) > 0.01:
+        if float(position.unrealized_pl) > profitmax or float(position.unrealized_plpc) > 0.01:
             print("unrealized PL GAIN", position.symbol, position.unrealized_pl)
             api.close_position(position.symbol)
             close_symbol_orders(api, position.symbol)
             closed.append((position.symbol, float(position.unrealized_pl)))
-        elif float(position.unrealized_pl) < -150 or float(position.unrealized_plpc) < -0.01:
+        elif float(position.unrealized_pl) < -1*profitmax or float(position.unrealized_plpc) < -0.01:
             print("unrealized PL LOSS", position.symbol, position.unrealized_pl)
             api.close_position(position.symbol)
             close_symbol_orders(api, position.symbol)
@@ -214,9 +214,6 @@ def submit_trade_w_trail(api, item, contracts):
     error = None
     if item.order == "sell" and has_position(api, item.ticker):
         return sell_limit_order(api, item, contracts)
-    elif item.order == "sell":
-        return False
-    # sell
     try:
         # closed = close_symbol_orders(api, item.ticker)       
         # price = get_current_price(api, item.ticker)
@@ -284,13 +281,19 @@ def submit_regular_trade(api, item, contracts):
 def handler(item, use_max_value=False):
     print("ITEM handler", item)
     can_trade = is_during_hours(item.ticker)
+
+    # if (item.trade_type === "buy_sell"):
     api = get_api()
     account = api.get_account()
     contracts = get_contracts(api, item, float(account.cash), use_max_value)
     # submit_trade_w_brackets(api, item, contracts)
-    submit_trade_w_trail(api, item, contracts)
+    print("trade type", item.trade_type)
+    if item.trade_type == "buy_sell":
+        sell_limit_order(api, item, contracts)
+    else:
+        submit_trade_w_trail(api, item, contracts)
 
-    # close_positions(api)
+    close_positions(api)
     # api.cancel_all_orders() # remove open orders
     account = api.get_account()
     return account.cash

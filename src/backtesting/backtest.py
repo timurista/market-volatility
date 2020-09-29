@@ -9,6 +9,9 @@ ALPACA_PAPER = True
 
 
 class SmaCross(bt.SignalStrategy):
+  def log(self, txt, dt=None):     
+    dt = dt or self.datas[0].datetime.date(0)     
+    print('%s, %s' % (dt.isoformat(), txt)) #Print date and close
   def __init__(self):
     sma1, sma2 = bt.ind.SMA(period=20), bt.ind.SMA(period=200)
     crossover = bt.ind.CrossOver(sma1, sma2)
