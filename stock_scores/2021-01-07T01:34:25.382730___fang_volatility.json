@@ -5,16 +5,16 @@
       "volatility": 18.294634683404993
     },
     {
-      "ticker": "AAPL",
-      "volatility": 11.114852153966863
-    },
-    {
       "ticker": "MSFT",
       "volatility": 11.072163264081553
     },
     {
+      "ticker": "AAPL",
+      "volatility": 11.002749935321054
+    },
+    {
       "ticker": "FB",
-      "volatility": 8.688241280511944
+      "volatility": 8.661290366080202
     },
     {
       "ticker": "NVDA",
@@ -25,5 +25,5 @@
       "volatility": 4.051500481425285
     }
   ],
-  "updated": "2021-01-06T21:34:24.643596"
+  "updated": "2021-01-07T01:34:25.296250"
 }
