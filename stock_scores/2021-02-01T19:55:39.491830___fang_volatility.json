@@ -1,0 +1,29 @@
+{
+  "list": [
+    {
+      "ticker": "GOOGL",
+      "volatility": 1.0894274424934156
+    },
+    {
+      "ticker": "MSFT",
+      "volatility": 1.0240189160264026
+    },
+    {
+      "ticker": "FB",
+      "volatility": 0.5124792883769766
+    },
+    {
+      "ticker": "AAPL",
+      "volatility": 0.4925311429922548
+    },
+    {
+      "ticker": "NVDA",
+      "volatility": 0.4465548648950115
+    },
+    {
+      "ticker": "NFLX",
+      "volatility": 0.41002221215723933
+    }
+  ],
+  "updated": "2021-02-01T19:55:39.356958"
+}
