@@ -13,17 +13,17 @@
       "volatility": 0.4755502273641769
     },
     {
-      "ticker": "FB",
-      "volatility": 0.40865697440641374
+      "ticker": "AAPL",
+      "volatility": 0.40975311804582437
     },
     {
-      "ticker": "AAPL",
-      "volatility": 0.39331505856878063
+      "ticker": "FB",
+      "volatility": 0.40865697440641374
     },
     {
       "ticker": "NFLX",
       "volatility": 0.37403508844375144
     }
   ],
-  "updated": "2021-02-06T10:34:24.486493"
+  "updated": "2021-02-06T14:34:26.120133"
 }
